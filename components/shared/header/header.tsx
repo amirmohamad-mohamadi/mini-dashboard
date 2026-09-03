@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Router } from "lucide-react";
+import { Router } from "lucide-react";
 import { ThemeToggle } from "@/components/shared/header/theme-toggle";
 
 export default function Header() {
@@ -24,17 +24,7 @@ export default function Header() {
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <button className="hidden sm:flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-emerald-600 shadow-lg shadow-emerald-500/30 whitespace-nowrap">
-              <Plus className="h-5 w-5" />
-              افزودن دستگاه
-            </button>
           </div>
-        </div>
-        <div className="mt-4 sm:hidden">
-          <button className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-emerald-600 shadow-lg shadow-emerald-500/30">
-            <Plus className="h-5 w-5" />
-            افزودن دستگاه
-          </button>
         </div>
       </div>
     </header>
