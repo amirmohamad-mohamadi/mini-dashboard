@@ -2,12 +2,12 @@
 
 import { useCallback, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { DeviceStatus } from "@/types/device";
+import { type DeviceStatus } from "@/types/device";
 
-interface Filters {
+type Filters = {
   search: string;
   status: "All" | DeviceStatus;
-}
+};
 
 export function useUrlFilters() {
   const router = useRouter();

@@ -1,12 +1,17 @@
 "use client";
 
 import { Wifi, WifiOff, TriangleAlert, LucideIcon } from "lucide-react";
+import { type Device } from "@/types/device";
 
 type StatusCardProps = {
   icon: LucideIcon;
   label: string;
   count: number;
   color: "emerald" | "amber" | "gray";
+};
+
+type StatsCardsProps = {
+  devices: Device[];
 };
 
 const colorClasses = {
@@ -35,7 +40,7 @@ function StatusCard({ icon: Icon, label, count, color }: StatusCardProps) {
   const colors = colorClasses[color];
 
   return (
-    <div className="min-w-[72px] rounded-lg border-2 border-gray-200 bg-white px-4 py-3 text-center dark:border-gray-600 dark:bg-gray-800">
+    <div className="min-w-18 rounded-lg border-2 border-gray-200 bg-white px-4 py-3 text-center dark:border-gray-600 dark:bg-gray-800">
       <Icon className={`mx-auto mb-1.5 h-5 w-5 ${colors.icon}`} />
       <span className={`block text-xs font-medium ${colors.label}`}>
         {label}
@@ -47,12 +52,21 @@ function StatusCard({ icon: Icon, label, count, color }: StatusCardProps) {
   );
 }
 
-export function StatsCards() {
+export function StatsCards({ devices }: StatsCardsProps) {
+  const online = devices.filter((d) => d.status === "Online").length;
+  const warning = devices.filter((d) => d.status === "Warning").length;
+  const offline = devices.filter((d) => d.status === "Offline").length;
+
   return (
     <div className="grid grid-cols-3 gap-3 sm:gap-4">
-      <StatusCard icon={Wifi} label="آنلاین" count={7} color="emerald" />
-      <StatusCard icon={TriangleAlert} label="هشدار" count={1} color="amber" />
-      <StatusCard icon={WifiOff} label="آفلاین" count={3} color="gray" />
+      <StatusCard icon={Wifi} label="آنلاین" count={online} color="emerald" />
+      <StatusCard
+        icon={TriangleAlert}
+        label="هشدار"
+        count={warning}
+        color="amber"
+      />
+      <StatusCard icon={WifiOff} label="آفلاین" count={offline} color="gray" />
     </div>
   );
 }

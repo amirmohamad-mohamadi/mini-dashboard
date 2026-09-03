@@ -1,17 +1,58 @@
 "use client";
 
+import { useDevices } from "@/hooks/use-devices";
+import { useUrlFilters } from "@/hooks/use-url-filters";
+import { DeviceTable } from "./device-table";
+import { DeviceCard } from "./device-card";
+import { EmptyState } from "./empty-state";
 import { StatsCards } from "./status-cards";
 import { DeviceFilters } from "./device-filters";
+import { DeviceModal } from "./device-modal";
+import { Plus } from "lucide-react";
+import { useState } from "react";
+import { DeviceFormSchema } from "@/lib/validations";
+import { toPersianNumber } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export function Devices() {
+  const { devices, isLoading, addDevice, isAdding, deleteDevice, isDeleting } =
+    useDevices();
+  const { filters } = useUrlFilters();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const filteredDevices = devices.filter((device) => {
+    if (!device) return false;
+    const search = filters?.search?.trim()?.toLowerCase() || "";
+    const status = filters?.status || "All";
+    const matchesSearch =
+      !search ||
+      device.name?.toLowerCase().includes(search) ||
+      false ||
+      device.ip?.includes(search) ||
+      false;
+    const matchesStatus = status === "All" || device.status === status;
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleAddDevice = async (data: DeviceFormSchema) => {
+    await addDevice(data);
+    setIsModalOpen(false);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-1 p-5">
+        <div className="skeleton h-14 rounded-xl"></div>
+        <div className="skeleton h-14 rounded-xl"></div>
+        <div className="skeleton h-14 rounded-xl"></div>
+        <div className="skeleton h-14 rounded-xl"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-6 space-y-4">
-      <div
-        className="glass-panel fade-in rounded-3xl bg-white/90 dark:bg-slate-900/90 
-                   backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 shadow-xl 
-                   shadow-slate-200/60 dark:shadow-slate-950/50 hover:shadow-2xl 
-                   hover:shadow-emerald-500/10 dark:hover:shadow-emerald-400/5 transition-all duration-300 px-5 py-6 sm:px-7"
-      >
+      <div className="glass-panel fade-in rounded-3xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/60 dark:shadow-slate-950/50 hover:shadow-2xl hover:shadow-emerald-500/10 dark:hover:shadow-emerald-400/5 transition-all duration-300 px-5 py-6 sm:px-7">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h2 className="text-xl font-bold text-slate-800 dark:text-white">
@@ -21,21 +62,61 @@ export function Devices() {
               مدیریت و مانیتورینگ دستگاه‌های شبکه
             </p>
           </div>
-          <StatsCards />
+          <StatsCards devices={devices} />
         </div>
         <DeviceFilters />
         <div className="mt-6 pt-4 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between">
           <p className="text-sm text-slate-600 dark:text-slate-400">
             تعداد کل دستگاه‌ها:{" "}
-            <strong
-              className="font-extrabold bg-gradient-to-r from-emerald-500
-                             to-teal-500 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent"
-            >
-              4
+            <strong className="font-extrabold bg-gradient-to-r from-emerald-500 to-teal-500 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+              {toPersianNumber(filteredDevices.length)}
             </strong>
           </p>
         </div>
       </div>
+
+      <div className="glass-panel mt-5 overflow-hidden rounded-3xl">
+        <div className="flex items-center justify-between border-b border-slate-600/15 p-4">
+          <span className="text-sm font-semibold">دستگاه‌ها</span>
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+            <span>افزودن دستگاه</span>
+          </Button>
+        </div>
+
+        {filteredDevices.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <>
+            <DeviceTable
+              devices={filteredDevices}
+              onDelete={deleteDevice}
+              isDeleting={isDeleting}
+            />
+            <div className="space-y-3 p-4 md:hidden">
+              {filteredDevices.map((device) => (
+                <DeviceCard
+                  key={device.id}
+                  device={device}
+                  onDelete={deleteDevice}
+                  isDeleting={isDeleting}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      <DeviceModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddDevice}
+        isSubmitting={isAdding}
+      />
     </div>
   );
 }

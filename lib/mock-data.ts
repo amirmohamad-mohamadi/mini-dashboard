@@ -1,4 +1,4 @@
-import { Device } from "@/types/device";
+import { type Device } from "@/types/device";
 
 export const MOCK_DEVICES: Device[] = [
   {
