@@ -1,24 +1,38 @@
 "use client";
 
+import { Suspense, useEffect, useState } from "react";
 import { useDevices } from "@/hooks/use-devices";
 import { useUrlFilters } from "@/hooks/use-url-filters";
 import { DeviceTable } from "./device-table";
-import { DeviceCard } from "./device-card";
 import { EmptyState } from "./empty-state";
 import { StatsCards } from "./status-cards";
 import { DeviceFilters } from "./device-filters";
 import { DeviceModal } from "./device-modal";
 import { Plus } from "lucide-react";
-import { useState } from "react";
 import { DeviceFormSchema } from "@/lib/validations";
 import { toPersianNumber } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { DeviceSkeleton } from "./device-skeleton";
 
-export function Devices() {
+function DevicesContent() {
   const { devices, isLoading, addDevice, isAdding, deleteDevice, isDeleting } =
     useDevices();
   const { filters } = useUrlFilters();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(true);
+
+  useEffect(() => {
+    if (!isLoading && devices.length > 0) {
+      const timer = setTimeout(() => {
+        setShowSkeleton(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, devices]);
+
+  if (isLoading || showSkeleton) {
+    return <DeviceSkeleton />;
+  }
 
   const filteredDevices = devices.filter((device) => {
     if (!device) return false;
@@ -39,17 +53,6 @@ export function Devices() {
     setIsModalOpen(false);
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-1 p-5">
-        <div className="skeleton h-14 rounded-xl"></div>
-        <div className="skeleton h-14 rounded-xl"></div>
-        <div className="skeleton h-14 rounded-xl"></div>
-        <div className="skeleton h-14 rounded-xl"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="mt-6 space-y-4">
       <div className="glass-panel fade-in rounded-3xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/60 dark:shadow-slate-950/50 hover:shadow-2xl hover:shadow-emerald-500/10 dark:hover:shadow-emerald-400/5 transition-all duration-300 px-5 py-6 sm:px-7">
@@ -65,7 +68,7 @@ export function Devices() {
           <StatsCards devices={devices} />
         </div>
         <DeviceFilters />
-        <div className="mt-6 pt-4 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between">
+        <div className="mt-6 pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
           <p className="text-sm text-slate-600 dark:text-slate-400">
             تعداد کل دستگاه‌ها:{" "}
             <strong className="font-extrabold bg-gradient-to-r from-emerald-500 to-teal-500 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
@@ -92,20 +95,22 @@ export function Devices() {
           <EmptyState />
         ) : (
           <>
-            <DeviceTable
-              devices={filteredDevices}
-              onDelete={deleteDevice}
-              isDeleting={isDeleting}
-            />
-            <div className="space-y-3 p-4 md:hidden">
-              {filteredDevices.map((device) => (
-                <DeviceCard
-                  key={device.id}
-                  device={device}
-                  onDelete={deleteDevice}
-                  isDeleting={isDeleting}
-                />
-              ))}
+            <div className="hidden md:block">
+              <DeviceTable
+                devices={filteredDevices}
+                onDelete={deleteDevice}
+                isDeleting={isDeleting}
+                viewMode="table"
+              />
+            </div>
+
+            <div className="md:hidden">
+              <DeviceTable
+                devices={filteredDevices}
+                onDelete={deleteDevice}
+                isDeleting={isDeleting}
+                viewMode="card"
+              />
             </div>
           </>
         )}
@@ -118,5 +123,13 @@ export function Devices() {
         isSubmitting={isAdding}
       />
     </div>
+  );
+}
+
+export function Devices() {
+  return (
+    <Suspense fallback={<DeviceSkeleton />}>
+      <DevicesContent />
+    </Suspense>
   );
 }
