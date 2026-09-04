@@ -3,7 +3,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Device, type DeviceFormData } from "@/types/device";
 import { useDeviceStore } from "@/store/device-store";
-import { log } from "console";
 
 const fetchDevices = async (): Promise<Device[]> => {
   await new Promise((resolve) => setTimeout(resolve, 800));
