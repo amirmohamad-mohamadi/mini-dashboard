@@ -119,7 +119,7 @@ export function DeviceTable({
               <th className={tableStyles.header}>آدرس IP</th>
               <th className={tableStyles.header}>وضعیت</th>
               <th className={tableStyles.header}>آخرین بررسی</th>
-              <th className={tableStyles.headerLeft}>عملیات</th>
+              <th className={tableStyles.header}>عملیات</th>
             </tr>
           </thead>
           <tbody>
@@ -144,7 +144,7 @@ export function DeviceTable({
                 <td className={`px-5 py-4 ${tableStyles.lastPing}`}>
                   {device.lastPing}
                 </td>
-                <td className="px-7 py-4 text-left">
+                <td className="px-7 py-4 text-center">
                   <div className="flex justify-start">
                     <Button
                       variant="ghost"
