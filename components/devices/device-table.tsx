@@ -6,6 +6,7 @@ import { Trash2 } from "lucide-react";
 import { type Device } from "@/types/device";
 import { DeleteConfirmModal } from "./delete-confirm-modal";
 import { DeviceCard } from "./device-card";
+import { toast } from "sonner";
 
 type DeviceTableProps = {
   devices: Device[];
@@ -52,6 +53,9 @@ export function DeviceTable({
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const deviceToDelete =
+    devices.find((device) => device.id === deleteId) ?? null;
+
   const handleDeleteClick = (id: string) => {
     setDeleteId(id);
     setIsDialogOpen(true);
@@ -64,7 +68,11 @@ export function DeviceTable({
       await onDelete(deleteId);
       setIsDialogOpen(false);
       setDeleteId(null);
+      toast.success(`${deviceToDelete?.name || "دستگاه"} از لیست حذف شد`);
     } catch (error) {
+      toast.error("خطا در حذف دستگاه!", {
+        description: "لطفاً مجدداً تلاش کنید",
+      });
       console.error("خطا در حذف:", error);
     }
   };
@@ -75,9 +83,6 @@ export function DeviceTable({
       setDeleteId(null);
     }
   };
-
-  const deviceToDelete =
-    devices.find((device) => device.id === deleteId) ?? null;
 
   if (viewMode === "card") {
     return (

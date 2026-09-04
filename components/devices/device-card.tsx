@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { DeleteConfirmModal } from "./delete-confirm-modal";
+import { toast } from "sonner";
 
 type DeviceCardProps = {
   device: Device;
@@ -39,7 +40,12 @@ export function DeviceCard({ device, onDelete, isDeleting }: DeviceCardProps) {
     try {
       await onDelete(device.id);
       setShowConfirm(false);
+
+      toast.success(`${device.name || "دستگاه"} از لیست حذف شد`);
     } catch (error) {
+      toast.error("خطا در حذف دستگاه!", {
+        description: "لطفاً مجدداً تلاش کنید",
+      });
       console.error("خطا در حذف:", error);
     }
   };

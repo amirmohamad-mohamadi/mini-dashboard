@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 import { Providers } from "./providers";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Mini Dashboard",
@@ -24,6 +25,7 @@ export default function RootLayout({
           <div className="min-h-screen bg-white dark:bg-[#09121d] transition-colors duration-300">
             {children}
           </div>
+          <Toaster position="top-right" richColors dir="rtl" duration={3000} />
         </Providers>
       </body>
     </html>

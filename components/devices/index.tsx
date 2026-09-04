@@ -13,6 +13,7 @@ import { DeviceFormSchema } from "@/lib/validations";
 import { toPersianNumber } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { DeviceSkeleton } from "./device-skeleton";
+import { toast } from "sonner";
 
 function DevicesContent() {
   const { devices, isLoading, addDevice, isAdding, deleteDevice, isDeleting } =
@@ -49,8 +50,16 @@ function DevicesContent() {
   });
 
   const handleAddDevice = async (data: DeviceFormSchema) => {
-    await addDevice(data);
-    setIsModalOpen(false);
+    try {
+      await addDevice(data);
+      setIsModalOpen(false);
+      toast.success(`${data.name || "دستگاه"} به لیست اضافه شد`);
+    } catch (error) {
+      toast.error("خطا در اضافه کردن دستگاه!", {
+        description: "لطفاً مجدداً تلاش کنید",
+      });
+      console.error("خطا در اضافه کردن:", error);
+    }
   };
 
   return (
